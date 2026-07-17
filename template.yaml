@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Xpert REST API
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs22.x
+    Architectures:
+      - x86_64
+    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    LoggingConfig:
+      LogFormat: JSON
+    Environment:
+      Variables:
+        DB_HOST: host.docker.internal
+        DB_PORT: "3306"
+        DB_NAME: logportal
+        LOG_LEVEL: debug
+        DB_USER: "root"
+        DB_PASSWORD: "dataflowisgr8"
+
+Resources:
+  #################################################
+  # API Gateway
+  #################################################
+  XpertApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: Xpert API
+      StageName: Prod
+
+  #################################################
+  # User Functions
+  #################################################
+
+  GetUserByEmailFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Metadata:
+       BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/users/getUserByEmail.lambdaHandler
+      Events:
+        GetUserByEmail:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /users/email/{email}
+            Method: get
+  
+  ListCustomersFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/customers/listCustomers.lambdaHandler
+      Events:
+        ListCustomers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /customers
+            Method: get
+  
+  ListUsersFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/users/listUsers.lambdaHandler
+      Events:
+        ListUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /users
+            Method: get
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint
+    Value: !Sub "https://${XpertApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

@@ -1,0 +1,16 @@
+{
+  "resource": "/customers",
+  "path": "/customers",
+  "httpMethod": "GET",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "cognito-user-id-example",
+        "email": "rich@xpert.nz",
+        "given_name": "Richard",
+        "family_name": "OBrien",
+        "cognito:groups": "super-user"
+      }
+    }
+  }
+}

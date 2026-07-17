@@ -1,0 +1,16 @@
+{
+  "resource": "/customers",
+  "path": "/customers",
+  "httpMethod": "GET",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "cognito-user-id-example",
+        "email": "geoff@xpert-devdata.co.uk",
+        "given_name": "Geoff",
+        "family_name": "Kennedy",
+        "cognito:groups": "admin"
+      }
+    }
+  }
+}

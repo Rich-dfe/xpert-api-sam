@@ -1,0 +1,19 @@
+{
+  "resource": "/users/email/{email}",
+  "path": "/users/email/rich@xpert.nz",
+  "httpMethod": "GET",
+  "pathParameters": {
+    "email": "rich@xpert.nz"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "cognito-user-id-example",
+        "email": "rich@xpert.nz",
+        "given_name": "Richard",
+        "family_name": "OBrien",
+        "cognito:groups": "admin"
+      }
+    }
+  }
+}
