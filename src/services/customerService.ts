@@ -16,3 +16,7 @@ export async function listUsersByCustomer(custId: String, context: RequestContex
         return customerRepository.listUsersByCustomer(custId);
     }
 }
+
+export async function listGroupsByCustomerUser(custId: string, userId:string){
+    return customerRepository.listGroupsByCustomerUser(custId, userId);
+}

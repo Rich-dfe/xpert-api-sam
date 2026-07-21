@@ -3,7 +3,8 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "xpert-api"
+stack_name = "xpert-api-next"
+region = "ap-southeast-2"
 
 [default.build.parameters]
 cached = true
@@ -16,6 +17,10 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
+s3_prefix = "xpert-api-next"
+region = "ap-southeast-2"
+disable_rollback = true
+image_repositories = []
 
 [default.package.parameters]
 resolve_s3 = true
