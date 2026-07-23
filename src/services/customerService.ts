@@ -12,7 +12,7 @@ export async function listCustomers(context: RequestContext){
 }
 
 export async function listUsersByCustomer(custId: String, context: RequestContext){
-    if(isAdmin(context)){
+    if(isAdmin(context) || isSuper(context)){
         return customerRepository.listUsersByCustomer(custId);
     }
 }

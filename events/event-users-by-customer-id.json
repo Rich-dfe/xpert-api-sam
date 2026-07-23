@@ -1,0 +1,19 @@
+{
+  "resource": "/customers/{cid}/users",
+  "path": "/customers/8/users",
+  "httpMethod": "GET",
+  "pathParameters": {
+    "cid": "19"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "cognito-user-id-example",
+        "email": "rich@xpert.nz",
+        "given_name": "Richard",
+        "family_name": "OBrien",
+        "cognito:groups": "admin"
+      }
+    }
+  }
+}

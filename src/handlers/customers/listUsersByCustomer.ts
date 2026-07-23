@@ -7,8 +7,10 @@ export async function lambdaHandler(
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> {
   try {
+    
     const context = await getRequestContext(event);
-    const custId = event.pathParameters?.id;
+    console.log('IM IN THE HANDLER!', event);
+    const custId = event.pathParameters?.cid;
 
     if (!custId) {
       return badRequest("Missing customerId.");
@@ -19,7 +21,8 @@ export async function lambdaHandler(
       context,
     );
     return ok(users);
-  } catch {
+  } catch(error) {
+    console.error("HANDLER ERROR:", error);
     return internalError("Something went wrong");
   }
 }

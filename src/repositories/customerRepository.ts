@@ -36,6 +36,7 @@ export async function listCustomersForAdmin(custId:Number): Promise<Customer[] |
 };
 
 export async function listUsersByCustomer(custId:String): Promise<User[] | null> {
+
   const pool = getPool();
 
   const [rows] = await pool.query<User[]>(

@@ -25,7 +25,7 @@ Globals:
         #################################################
         # LocalHost
         #################################################
-        # DB_HOST: host.docker.internal
+        # DB_HOST: host.dnocker.internal
         # DB_USER: "root"
         # DB_PASSWORD: "dataflowisgr8"
         # DB_PORT: "3306"
@@ -56,6 +56,11 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: arn:aws:cognito-idp:ap-southeast-2:224788441969:userpool/ap-southeast-2_ZUZUbfNba
 
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'http://localhost:3000'"
+
   #################################################
   # User Functions
   #################################################
@@ -74,6 +79,8 @@ Resources:
             RestApiId: !Ref XpertApi
             Path: /users/email/{email}
             Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
   
   ListCustomersFunction:
     Type: AWS::Serverless::Function
@@ -107,20 +114,22 @@ Resources:
             Path: /users
             Method: get
     
-  # ListUsersByCustomerFunction:
-  #   Type: AWS::Serverless::Function
-  #   Metadata:
-  #     BuildMethod: esbuild
-  #   Properties:
-  #     CodeUri: src/
-  #     Handler: handlers/customers/listUsers.lambdaHandler
-  #     Events:
-  #       ListUsersByCustomer:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref XpertApi
-  #           Path: /customers/{id}/users
-  #           Method: get  
+  ListUsersByCustomerFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/customers/listUsersByCustomer.lambdaHandler
+      Events:
+        ListUsersByCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /customers/{cid}/users
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer  
   
   ListGroupsByCustomerUserFunction:
     Type: AWS::Serverless::Function
@@ -136,6 +145,8 @@ Resources:
             RestApiId: !Ref XpertApi
             Path: /customers/{cid}/users/{uid}/groups
             Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
 
 Outputs:
   ApiUrl:

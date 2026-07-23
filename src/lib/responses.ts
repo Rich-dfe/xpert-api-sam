@@ -2,6 +2,7 @@ import { APIGatewayProxyResult } from "aws-lambda";
 
 const defaultHeaders = {
   "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "http://localhost:3000",
 };
 
 export function ok(data: unknown): APIGatewayProxyResult {
