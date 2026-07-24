@@ -20,3 +20,12 @@ export async function listUsersByCustomer(custId: String, context: RequestContex
 export async function listGroupsByCustomerUser(custId: string, userId:string){
     return customerRepository.listGroupsByCustomerUser(custId, userId);
 }
+
+export async function listLoggersByCustomerUserGroup(custId: string, userId:string, groupId:string){
+    //If 'Show All Loggers' is selected from the groups menu it returns -1  
+    if(groupId === "-1"){
+        return customerRepository.listLoggersByCustomerUser(custId, userId);
+    }else{
+        return customerRepository.listLoggersByCustomerUserGroup(custId, userId, groupId);
+    }
+}

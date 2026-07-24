@@ -2,6 +2,7 @@ import { getPool } from "../lib/database";
 import { Customer } from "../types/customer";
 import { Group } from "../types/groups";
 import { User } from "../types/user";
+import { Logger } from "../types/logger";
 
 export async function listCustomers(): Promise<Customer[]> {
 
@@ -59,6 +60,49 @@ export async function listGroupsByCustomerUser(custId: string, userId: string): 
         SELECT id, user_id, group_name AS groupName, notes
         FROM groups WHERE
         customer_id = ? AND user_id = ?
+        `,
+        [custId, userId],
+      );
+    
+      if (rows.length === 0) {
+        return null;
+      }
+    
+      return rows;
+    };
+
+    export async function listLoggersByCustomerUserGroup(custId: string, userId: string, groupId: string): Promise<Logger[] | null>{
+    
+    const pool = getPool();
+    
+      const [rows] = await pool.query<Logger[]>(
+        `
+        SELECT id, product_id AS productId, logger_uid AS loggerUid, logger_name AS loggerName, notes
+        FROM loggers WHERE
+        customer_id = ? 
+        AND user_id = ?
+        AND group_id = ?
+        `,
+        [custId, userId, groupId],
+      );
+    
+      if (rows.length === 0) {
+        return null;
+      }
+    
+      return rows;
+    };
+
+    export async function listLoggersByCustomerUser(custId: string, userId: string): Promise<Logger[] | null>{
+    
+    const pool = getPool();
+    
+      const [rows] = await pool.query<Logger[]>(
+        `
+        SELECT id, product_id AS productId, logger_uid AS loggerUid, logger_name AS loggerName, notes
+        FROM loggers WHERE
+        customer_id = ? 
+        AND user_id = ?
         `,
         [custId, userId],
       );

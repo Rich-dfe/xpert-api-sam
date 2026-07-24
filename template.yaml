@@ -147,6 +147,23 @@ Resources:
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
+  
+  ListLoggersByCustomerUserGroupFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/customers/listLoggersByCustomerUserGroup.lambdaHandler
+      Events:
+        ListUsersByCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /customers/{cid}/users/{uid}/group/{gid}/loggers
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
 
 Outputs:
   ApiUrl:

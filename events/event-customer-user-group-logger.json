@@ -1,0 +1,20 @@
+{
+  "resource": "/customer/{cid}/user/{uid}/loggers",
+  "path": "/customer/8/user/22/group/10/loggers",
+  "httpMethod": "GET",
+  "pathParameters": {
+    "cid": "8",
+    "uid": "22"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "cognito-user-id-example",
+        "email": "rich@xpert.nz",
+        "given_name": "Richard",
+        "family_name": "OBrien",
+        "cognito:groups": "admin"
+      }
+    }
+  }
+}
