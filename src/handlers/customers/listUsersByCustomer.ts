@@ -9,7 +9,7 @@ export async function lambdaHandler(
   try {
     
     const context = await getRequestContext(event);
-    console.log('IM IN THE HANDLER!', event);
+    
     const custId = event.pathParameters?.cid;
 
     if (!custId) {
@@ -20,6 +20,7 @@ export async function lambdaHandler(
       custId,
       context,
     );
+    console.log('##### IM IN THE HANDLER!', users);
     return ok(users);
   } catch(error) {
     console.error("HANDLER ERROR:", error);

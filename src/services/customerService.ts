@@ -1,14 +1,17 @@
 import { RequestContext } from "../lib/requestContext";
 import { isAdmin, isSuper } from "../lib/permissions";
 import * as customerRepository from "../repositories/customerRepository";
+import * as userRepository from "../repositories/userRepository"
 
 
 export async function listCustomers(context: RequestContext){
     if(isSuper(context)){
         return customerRepository.listCustomers();
     }else if(isAdmin(context)){
-        return customerRepository.listCustomersForAdmin(context.user.id);
+        return userRepository.listAdminCustomers(context.user.id);
     }
+
+    throw new Error("Users are not authorized to list customers.");
 }
 
 export async function listUsersByCustomer(custId: String, context: RequestContext){

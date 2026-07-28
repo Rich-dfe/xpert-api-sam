@@ -15,27 +15,6 @@ export async function listCustomers(): Promise<Customer[]> {
   return rows;
 };
 
-
-export async function listCustomersForAdmin(custId:Number): Promise<Customer[] | null> {
-
-  const pool = getPool();
-
-  const [rows] = await pool.query<Customer[]>(
-    `SELECT c.id, c.company_name
-       FROM users AS u 
-       JOIN customers_resellers AS r ON r.parent_customer_id = u.customer_id 
-       JOIN customers AS c ON c.id = r.child_customer_id 
-       WHERE u.id = ?`,
-      [custId]
-  );
-
-  if (rows.length === 0) {
-    return null;
-  }
-
-  return rows;
-};
-
 export async function listUsersByCustomer(custId:String): Promise<User[] | null> {
 
   const pool = getPool();
@@ -45,7 +24,7 @@ export async function listUsersByCustomer(custId:String): Promise<User[] | null>
   );
 
   if (rows.length === 0) {
-    return null;
+    return [];
   }
 
   return rows;
@@ -65,7 +44,7 @@ export async function listGroupsByCustomerUser(custId: string, userId: string): 
       );
     
       if (rows.length === 0) {
-        return null;
+        return [];
       }
     
       return rows;

@@ -8,7 +8,7 @@ export const lambdaHandler = async (
 ): Promise<APIGatewayProxyResult> => {
   try {
     const ctx = await getRequestContext(event);
-    console.log("CONTEXT",ctx);
+    //console.log("CONTEXT",ctx);
 
     const email = event.pathParameters?.email;
 

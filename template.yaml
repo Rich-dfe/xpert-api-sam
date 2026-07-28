@@ -32,7 +32,7 @@ Globals:
         # DB_NAME: logportal
         # LOG_LEVEL: debug
         #################################################
-        # Remote Host
+        # Dev Remote Host
         #################################################
         DB_HOST: dfe-dev.c1y5lk5xufmn.ap-southeast-2.rds.amazonaws.com
         DB_USER: "odyssey"
