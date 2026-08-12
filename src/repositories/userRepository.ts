@@ -14,7 +14,7 @@ export async function findUserByEmail(email: string): Promise<User | null> {
     [email],
   );
 
-  console.log('### USER',rows);
+  //console.log('### USER',rows);
 
   if (rows.length === 0) {
     return null;

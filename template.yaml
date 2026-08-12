@@ -39,7 +39,8 @@ Globals:
         DB_PASSWORD: "d4t4fl0wisgr8"
         DB_PORT: "3306"
         DB_NAME: logportal
-        LOG_LEVEL: debug 
+        LOG_LEVEL: debug
+        DDB_AUDIT_TABLE_NAME: odyAuditTrail  
 
 Resources:
   #################################################
@@ -57,10 +58,22 @@ Resources:
             UserPoolArn: arn:aws:cognito-idp:ap-southeast-2:224788441969:userpool/ap-southeast-2_ZUZUbfNba
 
       Cors:
-        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowMethods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
         AllowHeaders: "'Content-Type,Authorization'"
         AllowOrigin: "'http://localhost:3000'"
 
+  AuditDynamoDBWritePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+            Resource:
+              - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyAuditTrail
+              
   #################################################
   # User Functions
   #################################################
@@ -139,7 +152,7 @@ Resources:
       CodeUri: src/
       Handler: handlers/customers/listGroupsByCustomerUser.lambdaHandler
       Events:
-        ListUsersByCustomer:
+        ListGroupsByCustomer:
           Type: Api
           Properties:
             RestApiId: !Ref XpertApi
@@ -156,12 +169,31 @@ Resources:
       CodeUri: src/
       Handler: handlers/customers/listLoggersByCustomerUserGroup.lambdaHandler
       Events:
-        ListUsersByCustomer:
+        ListLoggersByCustomerUser:
           Type: Api
           Properties:
             RestApiId: !Ref XpertApi
             Path: /customers/{cid}/users/{uid}/group/{gid}/loggers
             Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+    
+  UpdateLoggerConfigSettingsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/loggers/updateLoggerConfigSettings.lambdaHandler
+      Policies:
+        - !Ref AuditDynamoDBWritePolicy
+      Events:
+        UpdateLoggerConfigSettings:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /loggers/config
+            Method: patch
             Auth:
               Authorizer: CognitoAuthorizer
 

@@ -6,3 +6,22 @@ export interface Logger extends RowDataPacket {
     productId: number;
     loggerUid: number;
 }
+
+export interface LoggerConfigSettings {
+  loggerName: string;
+  continuousLogging: boolean;
+  startDate: number;
+  stopDate: number;
+  loggingInterval: number;
+  timezone: string;
+  applyToGroup: boolean;
+  loggerNotes: string;
+  loggerId: string;
+}
+
+export interface LoggerLookup extends RowDataPacket{
+  user_id: number;
+  logger_uid: number; 
+  logger_name: string;
+  customer_id: number;
+}
