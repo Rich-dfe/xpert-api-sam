@@ -5,6 +5,7 @@ export async function writeAudit(record: AuditRecord) {
     const auditRecord = {
     ...record,
     logDateTime: Math.floor(Date.now()),
+    loggerUid: String(record.loggerUid),
   };
 
   console.log('IN SERVICE',auditRecord);

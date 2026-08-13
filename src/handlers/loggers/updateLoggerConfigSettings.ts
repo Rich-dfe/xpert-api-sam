@@ -33,7 +33,8 @@ export async function lambdaHandler(
     // UPDATE AUDIT TRAIL
     //////////////////////////////////////////
     await auditService.writeAudit({
-      loggerUid: body.loggerId,
+      loggerId: body.loggerId,
+      loggerUid: body.loggerUid,
       userId: context.user.id.toString(),
       action: "UPDATE",
       resource: "logger_config",

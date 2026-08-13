@@ -56,7 +56,7 @@ export async function listGroupsByCustomerUser(custId: string, userId: string): 
     
       const [rows] = await pool.query<Logger[]>(
         `
-        SELECT id, product_id AS productId, logger_uid AS loggerUid, logger_name AS loggerName, notes
+        SELECT id, product_id AS productId, logger_uid AS loggerUid, logger_name AS loggerName
         FROM loggers WHERE
         customer_id = ? 
         AND user_id = ?
@@ -78,7 +78,7 @@ export async function listGroupsByCustomerUser(custId: string, userId: string): 
     
       const [rows] = await pool.query<Logger[]>(
         `
-        SELECT id, product_id AS productId, logger_uid AS loggerUid, logger_name AS loggerName, notes
+        SELECT id, product_id AS productId, logger_uid AS loggerUid, logger_name AS loggerName
         FROM loggers WHERE
         customer_id = ? 
         AND user_id = ?
