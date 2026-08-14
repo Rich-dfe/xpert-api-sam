@@ -1,5 +1,4 @@
 export interface AuditRecord {
-  loggerId: string;
   loggerUid: string;
   userId: string;
   action: string;

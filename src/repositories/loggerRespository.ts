@@ -64,25 +64,3 @@ export async function updateLoggerConfig(
     connection.release();
   }
 }
-
-export async function getLogger(
-  loggerId: string
-): Promise<LoggerLookup | null> {
-
-  //console.log("getLoggerSerialNumber-1", loggerId);
-
-  const pool = getPool();
-
-  const [rows] = await pool.query<LoggerLookup[]>(
-    `
-      SELECT logger_uid, user_id, customer_id, logger_name
-      FROM loggers
-      WHERE id = ?
-    `,
-    [loggerId]
-  );
-
-  //console.log("### logger ID", rows);
-
-  return rows[0] ?? null;
-}

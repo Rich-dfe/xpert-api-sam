@@ -11,7 +11,7 @@ export async function lambdaHandler(
 ): Promise<APIGatewayProxyResult> {
   try {
     const context = await getRequestContext(event);
-
+    
     const body = JSON.parse(event.body ?? "");
 
     console.log("BODY", body);
@@ -20,20 +20,31 @@ export async function lambdaHandler(
       return badRequest("Missing body.");
     }
 
-    const isAuthorized = await loggerAuthorizationService.getloggerAuthorization(
-    body.loggerId,
-    context
-    );
+    ///////////////////////////////////////////
+    // IS USER AUTHORIZED TO CARRY OUT ACTION
+    //////////////////////////////////////////
+    const isAuthorized =
+      await loggerAuthorizationService.getloggerAuthorization(
+        body.loggerUid,
+        context,
+      );
 
-    console.log('calling logger auth result', isAuthorized);
+    console.log("calling logger auth result", isAuthorized);
+
+    ///////////////////////////////////////////
+    // CARRY OUT ACTION
+    //////////////////////////////////////////
+
+    if (!isAuthorized) {
+      return badRequest("Unauthorized action.");
+    }
 
     const result = await loggerService.updateLoggerConfigSettings(body);
 
     ///////////////////////////////////////////
-    // UPDATE AUDIT TRAIL
+    // UPDATE AUDIT TRAIL WITH ACTION
     //////////////////////////////////////////
     await auditService.writeAudit({
-      loggerId: body.loggerId,
       loggerUid: body.loggerUid,
       userId: context.user.id.toString(),
       action: "UPDATE",

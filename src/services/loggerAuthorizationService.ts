@@ -1,24 +1,24 @@
 import * as loggerRepository from "../repositories/loggerRespository";
 import { isUser, isAdmin, isSuper } from "../lib/permissions";
 import { RequestContext } from "../lib/requestContext";
-import { LoggerConfigSettings } from "../types/logger";
+import * as loggerAuthorizationRepository from "../repositories/loggerAuthorizationRepository";
 
 export async function getloggerAuthorization(
-  loggerId: string,
+  loggerUid: string,
   context: RequestContext,
 ): Promise<boolean | null> {
+    console.log('IN SERVICE',context);
   if (isUser(context)) {
-    console.log("CONTEXT USER ID", context.user.id);
-    const dbLoggerLookup = await loggerRepository.getLogger(loggerId);
-    console.log("DB LOGGER DATA USER ID", dbLoggerLookup);
-    if(context.user.id != dbLoggerLookup?.user_id){
-        return false;
-    }
+    const isUserAuthorized = loggerAuthorizationRepository.isLoggerOwnedByUser(loggerUid,context.user.id);
+    return isUserAuthorized
   } else if (isAdmin(context)) {
-    //See if the logger belongs to any customers that belong to the admin
+    const isAdminAuthorized = loggerAuthorizationRepository.isLoggerOwnedByAdmin(loggerUid,context.user.customerId);
+    return isAdminAuthorized;
   } else if( isSuper(context)){
-    console.log("In logger auth as super");
+    //If a super user allow all permissions
+    return true;
   }
 
-  return true;
+  //If there is an unknown role deny any permission to do anything. 
+  return false;
 }

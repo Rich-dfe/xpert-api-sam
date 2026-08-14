@@ -45,7 +45,7 @@ export async function getRequestContext(
         user: {
             id: user.id,
             name: user.name,
-            customerId: user.customer_id,
+            customerId: user.customerId,
         },
     };
 }
