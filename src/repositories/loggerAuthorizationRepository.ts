@@ -46,7 +46,7 @@ export async function isLoggerOwnedByAdmin(
   loggerUid: string,
   parentCustomerId: number,
 ): Promise<boolean> {
-    console.log('IN ADMIN CHECK', loggerUid, parentCustomerId);
+    //console.log('IN ADMIN CHECK', loggerUid, parentCustomerId);
   const pool = getPool();
 
   const [rows] = await pool.query<RowDataPacket[]>(

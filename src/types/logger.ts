@@ -13,6 +13,7 @@ export interface LoggerConfigSettings {
   startDate: number;
   stopDate: number;
   loggingInterval: number;
+  loggerSettingsVersion: number;
   timezone: string;
   applyToGroup: boolean;
   loggerNotes: string;
@@ -25,3 +26,5 @@ export interface LoggerLookup extends RowDataPacket{
   logger_name: string;
   customer_id: number;
 }
+
+export interface LoggerConfigSettingsDBResult extends LoggerConfigSettings, RowDataPacket {};

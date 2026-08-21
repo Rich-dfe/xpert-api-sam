@@ -12,7 +12,7 @@ export async function writeAudit(record: AuditRecord) {
     ttlDate: Math.floor(ttlTargetDate.getTime()/1000)
   };
 
-  console.log('IN SERVICE',auditRecord);
+  //console.log('IN SERVICE',auditRecord);
   //return true;
   return auditRepository.saveAuditRecord(auditRecord);
 }

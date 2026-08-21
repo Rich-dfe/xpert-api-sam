@@ -196,6 +196,23 @@ Resources:
             Method: patch
             Auth:
               Authorizer: CognitoAuthorizer
+  
+  fetchLoggerConfigSettingsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/loggers/fetchLoggerConfigSettings.lambdaHandler
+      Events:
+        fetchLoggerConfigSettings:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /loggers/{lid}/config
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
 
 Outputs:
   ApiUrl:

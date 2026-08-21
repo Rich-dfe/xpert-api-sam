@@ -2,7 +2,6 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import * as loggerService from "../../services/loggerService";
 import { notFound, ok, badRequest, internalError } from "../../lib/responses";
 import { getRequestContext } from "../../lib/requestContext";
-import { request } from "node:http";
 import * as auditService from "../../services/auditService";
 import * as loggerAuthorizationService from "../../services/loggerAuthorizationService";
 
@@ -11,7 +10,7 @@ export async function lambdaHandler(
 ): Promise<APIGatewayProxyResult> {
   try {
     const context = await getRequestContext(event);
-    
+
     const body = JSON.parse(event.body ?? "");
 
     console.log("BODY", body);
@@ -29,7 +28,7 @@ export async function lambdaHandler(
         context,
       );
 
-    console.log("calling logger auth result", isAuthorized);
+    //console.log("calling logger auth result", isAuthorized);
 
     ///////////////////////////////////////////
     // CARRY OUT ACTION
@@ -40,6 +39,12 @@ export async function lambdaHandler(
     }
 
     const result = await loggerService.updateLoggerConfigSettings(body);
+
+    ///////////////////////////////////////////
+    // UPDATE ETAG
+    //////////////////////////////////////////
+    const etagResult = await loggerService.updateEtag(context.user.id);
+    console.log('ETAG RESULT', etagResult);
 
     ///////////////////////////////////////////
     // UPDATE AUDIT TRAIL WITH ACTION
@@ -53,7 +58,8 @@ export async function lambdaHandler(
       data: body,
     });
 
-    if (result == 2) {
+    //These numbers represent the affected rows from the SQL queries 
+    if (result == 2 && etagResult == 1) {
       return ok(result);
     } else {
       return internalError("Config Settings Save Error!");
