@@ -97,10 +97,12 @@ export async function fetchLoggerConfigSettings(
       u.x002f as loggerSettingsVersion,
       u.timezone_offset as timezone,
       l.notes as loggerNotes,
-      g.id as groupId
+      g.id as groupId,
+      p.type_id as typeId
       FROM user_settings u
       JOIN loggers l ON u.logger_id = l.id
       JOIN groups g ON g.id = l.group_id
+      JOIN products p ON p.id = l.product_id
       WHERE l.id = ?`,
     [loggerId],
   );
@@ -132,3 +134,134 @@ export async function fetchLoggerUidByLoggerId(
 
   return rows[0].logger_uid;
 }
+
+export async function fetchTemperatureSenorConfig(
+  loggerId: string,
+): Promise<string | undefined> {
+  const pool = getPool();
+
+  const [rows] = await pool.execute<LoggerUidRow[]>(
+    `SELECT units FROM user_calibration_data_temp_loggers WHERE logger_id = ?`,
+    [loggerId],
+  );
+
+  if (rows.length === 0) {
+    return undefined;
+  }
+
+  return rows[0].units;
+}
+
+export async function updateTemperatureSensorConfig(loggerId: number, value:number): Promise<number> {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+  //const timestamp = Math.floor(Date.now() / 1000);
+  console.log('IN REPO',loggerId,value);
+  try {
+    const [result] = await connection.execute<ResultSetHeader>(
+      `UPDATE user_calibration_data_temp_loggers SET units=? WHERE logger_id=?`,
+      [value, loggerId],
+    );
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function fetchWaterLevelSenorConfig(
+  loggerId: string,
+): Promise<string | undefined> {
+  const pool = getPool();
+
+  const [rows] = await pool.execute<LoggerUidRow[]>(
+    `SELECT x0056 FROM user_settings WHERE logger_id = ?`,
+    [loggerId],
+  );
+
+  if (rows.length === 0) {
+    return undefined;
+  }
+
+  return rows[0].x0056;
+}
+
+export async function updateWaterLevelSensorConfig(loggerId: number, value:number): Promise<number> {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+  //const timestamp = Math.floor(Date.now() / 1000);
+  try {
+    const [result] = await connection.execute<ResultSetHeader>(
+      `UPDATE user_settings SET x0056=? WHERE logger_id=?`,
+      [value, loggerId],
+    );
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function fetchParSenorConfig(
+  loggerId: string,
+): Promise<string | undefined> {
+  const pool = getPool();
+
+  const [rows] = await pool.execute<LoggerUidRow[]>(
+    `SELECT x005F FROM user_settings WHERE logger_id = ?`,
+    [loggerId],
+  );
+
+  if (rows.length === 0) {
+    return undefined;
+  }
+
+  return rows[0].x005F;
+}
+
+export async function updateParSensorConfig(loggerId: number, value:number): Promise<number> {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+  //const timestamp = Math.floor(Date.now() / 1000);
+  try {
+    const [result] = await connection.execute<ResultSetHeader>(
+      `UPDATE user_settings SET x005F=? WHERE logger_id=?`,
+      [value, loggerId],
+    );
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function fetchMptSenorConfig(
+  loggerId: string,
+): Promise<string | undefined> {
+  const pool = getPool();
+
+  const [rows] = await pool.execute<LoggerUidRow[]>(
+    `SELECT mp_user_sensor_count FROM loggers WHERE id = ?`,
+    [loggerId],
+  );
+
+  if (rows.length === 0) {
+    return undefined;
+  }
+
+  return rows[0].mp_user_sensor_count;
+}
+
+export async function updateMptSensorConfig(loggerId: number, value:number): Promise<number> {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+  //const timestamp = Math.floor(Date.now() / 1000);
+  try {
+    const [result] = await connection.execute<ResultSetHeader>(
+      `UPDATE loggers SET mp_user_sensor_count=? WHERE id=?`,
+      [value, loggerId],
+    );
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+

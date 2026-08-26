@@ -18,6 +18,7 @@ export interface LoggerConfigSettings {
   applyToGroup: boolean;
   loggerNotes: string;
   loggerId: string;
+  typeId: number;
 }
 
 export interface LoggerLookup extends RowDataPacket{

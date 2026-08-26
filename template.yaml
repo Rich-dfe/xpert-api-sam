@@ -213,6 +213,42 @@ Resources:
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
+  
+  fetchSensorConfigSettingsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/loggers/fetchSensorConfigSettings.lambdaHandler
+      Events:
+        fetchLoggerConfigSettings:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /loggers/{lid}/sensor/{tid}
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  UpdateSensorConfigSettingsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/loggers/updateSensorConfigSettings.lambdaHandler
+      Policies:
+        - !Ref AuditDynamoDBWritePolicy
+      Events:
+        UpdateSensorConfigSettings:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /loggers/sensor/config
+            Method: patch
+            Auth:
+              Authorizer: CognitoAuthorizer
 
 Outputs:
   ApiUrl:
