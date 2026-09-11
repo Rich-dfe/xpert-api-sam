@@ -250,6 +250,42 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
+  fetchCalibrationSettingsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/loggers/fetchCalibrationSettings.lambdaHandler
+      Events:
+        fetchLoggerConfigSettings:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /loggers/{lid}/calibration/{tid}
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  UpdateLoggerCalibraionSettingsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/loggers/updateCalibrationSettings.lambdaHandler
+      Policies:
+        - !Ref AuditDynamoDBWritePolicy
+      Events:
+        UpdateSensorConfigSettings:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /loggers/calibration
+            Method: patch
+            Auth:
+              Authorizer: CognitoAuthorizer
+  
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint

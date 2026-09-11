@@ -29,3 +29,4 @@ export interface LoggerLookup extends RowDataPacket{
 }
 
 export interface LoggerConfigSettingsDBResult extends LoggerConfigSettings, RowDataPacket {};
+ 

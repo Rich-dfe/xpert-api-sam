@@ -1,5 +1,6 @@
 import * as loggerRepository from "../repositories/loggerRespository";
 import { LoggerConfigSettings } from "../types/logger";
+import { WaterlevelUpdateCalibrationSettings } from "../types/calibrationSettings";
 
 ///////////////////////////////////////////
 // LOGGER CONFIG SETTINGS
@@ -35,6 +36,9 @@ export async function fetchSensorConfigSettings(
     case "4132":
       // PAR
       return loggerRepository.fetchParSenorConfig(loggerId);
+    case "4137":
+      // Rain Gauge
+      return loggerRepository.fetchRainGaugeSenorConfig(loggerId);
     case "4161":
       // Multi Profile
       return loggerRepository.fetchMptSenorConfig(loggerId);
@@ -59,6 +63,9 @@ export async function updateSensorConfigSettings(
     case "4132":
       // PAR
       return loggerRepository.updateParSensorConfig(loggerId,value);
+    case "4137":
+      // Rain Gauge
+      return loggerRepository.updateRainGaugeSensorConfig(loggerId,value);
     case "4161":
       // Multi Profile
       return loggerRepository.updateMptSensorConfig(loggerId,value);
@@ -73,6 +80,56 @@ export async function updateSensorConfigSettings(
 ///////////////////////////////////////////
 // CALIBRATION SETTINGS
 //////////////////////////////////////////
+export async function fetchCalibrationSettings(
+  loggerId: string,
+  typeId: string,
+) {
+  switch (typeId) {
+    case "4131":
+      // Water Level
+      return loggerRepository.fetchWaterLevelCalibration(loggerId);
+    case "4132":
+      // PAR
+      return loggerRepository.fetchParCalibration(loggerId);
+    case "4137":
+      // Rain Gauge
+      return loggerRepository.fetchParCalibration(loggerId);
+    case "4161":
+      // Multi Profile
+      return loggerRepository.fetchMptCalibration(loggerId);
+    case "4181":
+      // Temperature sensor
+      return loggerRepository.fetchTemperatureCalibration(loggerId);
+    default:
+    // Code runs if no cases match
+  }
+}
+
+export async function updateCalibrationSettings(
+  loggerId: number,
+  settings: WaterlevelUpdateCalibrationSettings,
+  typeId: string,
+) {
+  switch (typeId) {
+    case "4131":
+      // Water Level
+      return loggerRepository.updateWaterLevelCalibrationSettings(loggerId,settings);
+    case "4132":
+      // PAR
+      //return loggerRepository.fetchParCalibration(loggerId);
+    case "4137":
+      // Rain Gauge
+      //return loggerRepository.fetchParCalibration(loggerId);
+    case "4161":
+      // Multi Profile
+      //return loggerRepository.fetchMptCalibration(loggerId);
+    case "4181":
+      // Temperature sensor
+      //return loggerRepository.fetchTemperatureCalibration(loggerId);
+    default:
+    // Code runs if no cases match
+  }
+}
 
 ///////////////////////////////////////////
 // OTHER
