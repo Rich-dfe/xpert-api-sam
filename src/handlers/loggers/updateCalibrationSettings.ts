@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import * as loggerService from "../../services/loggerService";
+import * as calibrationService from "../../services/calibrationService";
 import { notFound, ok, badRequest, internalError } from "../../lib/responses";
 import { getRequestContext } from "../../lib/requestContext";
 import * as loggerAuthorizationService from "../../services/loggerAuthorizationService";
+import { WaterlevelUpdateCalibrationSettings } from "../../types/calibrationSettings";
 
 export async function lambdaHandler(
   event: APIGatewayProxyEvent,
@@ -15,7 +16,7 @@ export async function lambdaHandler(
     console.log("BODY", body);
 
     const typeId = String(body.typeId);
-    const loggerId = Number(body.loggerId);
+    const loggerId = String(body.loggerId);
     const loggerUid = body.loggerUid;
 
     console.log(typeId,loggerId,loggerUid);
@@ -42,7 +43,7 @@ export async function lambdaHandler(
     // ///////////////////////////////////////////
     // // CARRY OUT ACTION
     // //////////////////////////////////////////
-    const result = await loggerService.updateCalibrationSettings(loggerId,body,typeId);
+    const result = await calibrationService.updateCalibrationSettings(loggerId,body,typeId);
     console.log("CALIBRATION SETTINGS", result);
 
     

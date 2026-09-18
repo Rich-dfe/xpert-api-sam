@@ -1,4 +1,5 @@
 import { RowDataPacket } from "mysql2";
+import { OnDatagramStatusCallback } from "node:quic";
 
 export interface WaterlevelCalibrationRow extends RowDataPacket {
   readingA: number;
@@ -22,7 +23,7 @@ export interface WaterlevelCalibrationSettings {
   temperature: number;
   resolution: number;
   temperatureCompensation: number;
-  serverSideCalFlag: number;
+  serverSideCalFlag: boolean;
 }
 
 //The settings expected by the database when updating the calibration 
@@ -32,4 +33,19 @@ export interface WaterlevelUpdateCalibrationSettings {
   firstReadingLogger: number;
   secondReadingLogger: number;
   temperature: number;
+  polynomialA: number;
+  polynomialB: number;
+  polynomialE: number;
+  K0?: number;
+  K1?: number;
+}
+
+//The manufacturing settings returned from the database
+export interface WaterlevelMfrCalibrationSettings extends RowDataPacket {
+  a: number;
+  b: number;
+  e: number;
+  K0: number;
+  K1: number;
+  sensorLength: number;
 }

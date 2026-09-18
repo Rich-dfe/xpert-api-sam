@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import * as loggerService from "../../services/loggerService";
+import * as calibrationService from "../../services/calibrationService"
 import { notFound, ok, badRequest, internalError } from "../../lib/responses";
 import { getRequestContext } from "../../lib/requestContext";
 import * as loggerAuthorizationService from "../../services/loggerAuthorizationService";
@@ -45,7 +46,7 @@ export async function lambdaHandler(
     // ///////////////////////////////////////////
     // // CARRY OUT ACTION
     // //////////////////////////////////////////
-    const result = await loggerService.fetchCalibrationSettings(loggerId,typeId);
+    const result = await calibrationService.fetchCalibrationSettings(loggerId,typeId);
     console.log("CALIBRATION SETTINGS", result);
 
     return ok(result);
