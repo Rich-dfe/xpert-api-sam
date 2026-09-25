@@ -18,8 +18,15 @@ export async function fetchLoggerConfigSettings(loggerId: string) {
 ///////////////////////////////////////////
 // ETAG UPDATE
 //////////////////////////////////////////
-export async function updateEtag(userId: number) {
-  return loggerRepository.updateEtag(userId);
+export async function updateEtag(loggerId: number) {
+  return loggerRepository.updateEtag(loggerId);
+}
+
+///////////////////////////////////////////
+// SERVER SETTINGS VERSION UPDATE
+//////////////////////////////////////////
+export async function updateServerSettingsVersion(loggerId: number) {
+  return loggerRepository.updateSettingsversion(loggerId);
 }
 
 ///////////////////////////////////////////

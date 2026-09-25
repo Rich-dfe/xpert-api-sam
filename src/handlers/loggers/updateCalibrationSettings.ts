@@ -4,6 +4,8 @@ import { notFound, ok, badRequest, internalError } from "../../lib/responses";
 import { getRequestContext } from "../../lib/requestContext";
 import * as loggerAuthorizationService from "../../services/loggerAuthorizationService";
 import { WaterlevelUpdateCalibrationSettings } from "../../types/calibrationSettings";
+import * as auditService from "../../services/auditService";
+import * as loggerService from "../../services/loggerService";
 
 export async function lambdaHandler(
   event: APIGatewayProxyEvent,
@@ -19,7 +21,7 @@ export async function lambdaHandler(
     const loggerId = String(body.loggerId);
     const loggerUid = body.loggerUid;
 
-    console.log(typeId,loggerId,loggerUid);
+    console.log(typeId, loggerId, loggerUid);
 
     if (!body) {
       return badRequest("Missing body.");
@@ -43,10 +45,38 @@ export async function lambdaHandler(
     // ///////////////////////////////////////////
     // // CARRY OUT ACTION
     // //////////////////////////////////////////
-    const result = await calibrationService.updateCalibrationSettings(loggerId,body,typeId);
+    const result = await calibrationService.updateCalibrationSettings(
+      loggerId,
+      body,
+      typeId,
+    );
     console.log("CALIBRATION SETTINGS", result);
 
-    
+    ///////////////////////////////////////////
+    // UPDATE ETAG
+    //////////////////////////////////////////
+    const etagResult = await loggerService.updateEtag(body.loggerId);
+    console.log("ETAG RESULT", etagResult);
+
+    ///////////////////////////////////////////
+    // UPDATE SERVER SETTINGS VERSION
+    //////////////////////////////////////////
+    const settingsServerVersionResult = await loggerService.updateServerSettingsVersion(body.loggerId);
+    console.log("SERVER SETTINGS UPDATE RESULT", settingsServerVersionResult);
+
+    ///////////////////////////////////////////
+    // UPDATE AUDIT TRAIL WITH ACTION
+    //////////////////////////////////////////
+    await auditService.writeAudit({
+      loggerUid: body.loggerUid,
+      userId: context.user.id.toString(),
+      action: "UPDATE CALIBRATION",
+      resource: "logger_calibration",
+      resourceId: body.loggerId,
+      data: body,
+    });
+
+    console.log('Query Results',result, etagResult);
     return ok(result);
 
   } catch (error) {

@@ -68,15 +68,32 @@ export async function updateLoggerConfig(
   }
 }
 
-export async function updateEtag(userId: number): Promise<number> {
+//This has to be done based on the loggerId as a super user could be logged in and
+//updating another users logger settings.
+export async function updateEtag(loggerId: number): Promise<number> {
   const pool = getPool();
   const connection = await pool.getConnection();
   const timestamp = Math.floor(Date.now() / 1000);
 
   try {
     const [result] = await connection.execute<ResultSetHeader>(
-      `UPDATE users SET etag_token = ? WHERE id=?`,
-      [timestamp, userId],
+      `UPDATE users SET etag_token = ? WHERE id=(SELECT user_id FROM loggers WHERE id=?)`,
+      [timestamp, loggerId],
+    );
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function updateSettingsversion(loggerId: number): Promise<number> {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+
+  try {
+    const [result] = await connection.execute<ResultSetHeader>(
+      `UPDATE user_settings SET x002F = x002F+1 WHERE logger_id = ?`,
+      [loggerId],
     );
     return result.affectedRows;
   } catch (error) {

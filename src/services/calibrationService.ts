@@ -1,5 +1,5 @@
 import * as calibrationRepository from "../repositories/calibrationRepository";
-import { WaterlevelUpdateCalibrationSettings } from "../types/calibrationSettings";
+import { WaterlevelUpdateCalibrationSettings, UpdateCalibrationSettings, ParCalibrationRow } from "../types/calibrationSettings";
 import { roundUp, calculateSlope, roundUpResolution } from "../lib/helpers";
 
 ///////////////////////////////////////////
@@ -32,11 +32,13 @@ export async function fetchCalibrationSettings(
 
 export async function updateCalibrationSettings(
   loggerId: string,
-  settings: WaterlevelUpdateCalibrationSettings,
+  settings: UpdateCalibrationSettings,
   typeId: string,
 ) {
   switch (typeId) {
     case "4131":
+      const waterLevelSettings = settings as WaterlevelUpdateCalibrationSettings;
+
         const defaultPulseCount = 110;
       // Water Level
       const mfrCalibrationSettings =
@@ -69,22 +71,25 @@ export async function updateCalibrationSettings(
       const polynomialValueA = (10*settings.firstReadingReference)-((settings.temperature*100)*polynomialValueE)-lowCalculatedRaw*polynomialValueB;
       const resolution = roundUpResolution(polynomialValueB/10,1);
       const temperatureCompenation = polynomialValueE*10;
-      console.log('CAL VALUES',polynomialValueA,polynomialValueB,polynomialValueE,mfrCalibrationSettings?.K0,mfrCalibrationSettings?.K1,resolution,temperatureCompenation);
+      //console.log('CAL VALUES',polynomialValueA,polynomialValueB,polynomialValueE,mfrCalibrationSettings?.K0,mfrCalibrationSettings?.K1,resolution,temperatureCompenation);
       //console.log('POLYA',settings.firstReadingReference,settings.temperature,polynomialValueE,lowCalculatedRaw,polynomialValueB);
       //console.log('POLYE',mfrCalibrationSettings?.e!,mfrCalibrationSettings?.sensorLength!,defaultPulseCount,polynomialValueB,mfrCalibrationSettings?.b!);
-      settings.polynomialA = polynomialValueA;
-      settings.polynomialB = polynomialValueB;
-      settings.polynomialE = polynomialValueE;
-      settings.K0 = mfrCalibrationSettings?.K0;
-      settings.K1 = mfrCalibrationSettings?.K1;
+      waterLevelSettings.polynomialA = polynomialValueA;
+      waterLevelSettings.polynomialB = polynomialValueB;
+      waterLevelSettings.polynomialE = polynomialValueE;
+      waterLevelSettings.K0 = mfrCalibrationSettings?.K0;
+      waterLevelSettings.K1 = mfrCalibrationSettings?.K1;
 
       return calibrationRepository.updateWaterLevelCalibrationSettings(
         loggerId,
-        settings,
+        waterLevelSettings,
       );
     case "4132":
     // PAR
-    //return loggerRepository.fetchParCalibration(loggerId);
+    const ParSettings = settings as ParCalibrationRow;
+    //Covert the minutes from the UI to seconds for the DB column
+    ParSettings.testDuration = ParSettings.testDuration*60;
+    return calibrationRepository.updateParCalibrationSettings(loggerId, ParSettings);
     case "4137":
     // Rain Gauge
     //return loggerRepository.fetchParCalibration(loggerId);

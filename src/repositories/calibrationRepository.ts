@@ -4,6 +4,7 @@ import {
   WaterlevelUpdateCalibrationSettings,
   WaterlevelCalibrationSettings,
   WaterlevelMfrCalibrationSettings,
+  ParCalibrationRow
 } from "../types/calibrationSettings";
 import { ResultSetHeader } from "mysql2";
 import { createRdsCurrentTimeStamp } from "../lib/helpers";
@@ -12,10 +13,13 @@ import { RowDataPacket } from "mysql2/promise";
 ///////////////////////////////////////////
 // CALIBRATION SETTINGS
 //////////////////////////////////////////
+
+
 type LoggerUidRow = RowDataPacket & {
   logger_uid: string;
 };
 
+// WATER LEVEL //
 export async function fetchWaterLevelMfrCalibrationSettings(
   loggerId: string,
 ): Promise<WaterlevelMfrCalibrationSettings | undefined> {
@@ -59,8 +63,7 @@ export async function fetchWaterLevelCalibration(
     temperature: Number(rows[0].calibration_temperature),
     resolution: Number(rows[0].resolution),
     temperatureCompensation: Number(rows[0].temperature_compensation),
-    //serverSideCalFlag: Number(rows[0].server_side_cal_flag),
-    serverSideCalFlag: rows[0].server_side_cal_flag === 1
+    serverSideCalFlag: rows[0].server_side_cal_flag === 1 //return true/false dependoing on DB value
   };
 }
 
@@ -77,7 +80,7 @@ export async function updateWaterLevelCalibrationSettings(
   //const timestamp = Math.floor(Date.now() / 1000);
   try {
     const [result] = await connection.execute<ResultSetHeader>(
-      `UPDATE user_calibration_data_wl SET a=?,b=?,e=?,K0=?,K1=?,readingA=?, readingB=?, actualA=?, actualB=?, calibration_temperature=? WHERE logger_id=?`,
+      `UPDATE user_calibration_data_wl SET a=?,b=?,e=?,K0=?,K1=?,readingA=?, readingB=?, actualA=?, actualB=?, calibration_temperature=?,server_side_cal_flag=? WHERE logger_id=?`,
       [
         settings.polynomialA,
         settings.polynomialB,
@@ -89,6 +92,7 @@ export async function updateWaterLevelCalibrationSettings(
         settings.firstReadingReference,
         settings.secondReadingReference,
         settings.temperature,
+        settings.serverSideCalFlag,
         loggerId,
       ],
     );
@@ -98,13 +102,16 @@ export async function updateWaterLevelCalibrationSettings(
   }
 }
 
+// END OF WATER LEVEL //
+
+// PAR //
 export async function fetchParCalibration(
   loggerId: string,
-): Promise<string | undefined> {
+): Promise<ParCalibrationRow | undefined> {
   const pool = getPool();
 
-  const [rows] = await pool.execute<LoggerUidRow[]>(
-    `SELECT logger_value, reference_value, reference_interval, units  FROM user_calibration_data_par WHERE logger_id = ?`,
+  const [rows] = await pool.execute<ParCalibrationRow[]>(
+    `SELECT logger_value AS loggerReadingTotal, reference_value AS refReadingAverage , reference_interval AS testDuration, units  FROM user_calibration_data_par WHERE logger_id = ?`,
     [loggerId],
   );
 
@@ -112,8 +119,38 @@ export async function fetchParCalibration(
     return undefined;
   }
 
-  return rows[0].mp_user_sensor_count;
+  console.log("PAR ROW",rows);
+  rows[0].typeId = 4132;
+  return rows[0];
 }
+
+export async function updateParCalibrationSettings(
+  loggerId: string,
+  settings: ParCalibrationRow,
+): Promise<number> {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+
+  //const timestamp = Math.floor(Date.now() / 1000);
+  try {
+    const [result] = await connection.execute<ResultSetHeader>(
+      `UPDATE user_calibration_data_par SET logger_value=?,reference_value=?,reference_interval=?,units=? WHERE logger_id=?`,
+      [
+        settings.loggerReadingTotal,
+        settings.refReadingAverage,
+        settings.testDuration,
+        settings.units,
+        loggerId,
+      ],
+    );
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+// END OF PAR //
 
 export async function fetchMptCalibration(
   loggerId: string,

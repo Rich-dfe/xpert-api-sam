@@ -49,8 +49,14 @@ export async function lambdaHandler(
     // ///////////////////////////////////////////
     // // UPDATE ETAG
     // //////////////////////////////////////////
-    const etagResult = await loggerService.updateEtag(context.user.id);
+    const etagResult = await loggerService.updateEtag(body.loggerId);
     console.log('ETAG RESULT', etagResult);
+    
+    ///////////////////////////////////////////
+    // UPDATE SERVER SETTINGS VERSION
+    //////////////////////////////////////////
+    const settingsServerVersionResult = await loggerService.updateServerSettingsVersion(body.loggerId);
+    console.log("SERVER SETTINGS UPDATE RESULT", settingsServerVersionResult);
 
     // ///////////////////////////////////////////
     // // UPDATE AUDIT TRAIL WITH ACTION
