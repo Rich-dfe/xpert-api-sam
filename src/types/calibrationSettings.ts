@@ -43,6 +43,9 @@ export interface WaterlevelUpdateCalibrationSettings {
   K0?: number;
   K1?: number;
   serverSideCalFlag:boolean;
+  reset:boolean;
+  resolution:number;
+  tempComp:number;
 }
 
 //The manufacturing settings returned from the database

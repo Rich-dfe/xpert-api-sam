@@ -4,7 +4,7 @@ import {
   WaterlevelUpdateCalibrationSettings,
   WaterlevelCalibrationSettings,
   WaterlevelMfrCalibrationSettings,
-  ParCalibrationRow
+  ParCalibrationRow,
 } from "../types/calibrationSettings";
 import { ResultSetHeader } from "mysql2";
 import { createRdsCurrentTimeStamp } from "../lib/helpers";
@@ -13,7 +13,6 @@ import { RowDataPacket } from "mysql2/promise";
 ///////////////////////////////////////////
 // CALIBRATION SETTINGS
 //////////////////////////////////////////
-
 
 type LoggerUidRow = RowDataPacket & {
   logger_uid: string;
@@ -63,7 +62,7 @@ export async function fetchWaterLevelCalibration(
     temperature: Number(rows[0].calibration_temperature),
     resolution: Number(rows[0].resolution),
     temperatureCompensation: Number(rows[0].temperature_compensation),
-    serverSideCalFlag: rows[0].server_side_cal_flag === 1 //return true/false dependoing on DB value
+    serverSideCalFlag: rows[0].server_side_cal_flag === 1, //return true/false dependoing on DB value
   };
 }
 
@@ -74,13 +73,13 @@ export async function updateWaterLevelCalibrationSettings(
   const pool = getPool();
   const connection = await pool.getConnection();
 
-  if(settings.K0 === undefined || settings.K1 === undefined){
-    throw new Error('K0 and K1 are required.')
+  if (settings.K0 === undefined || settings.K1 === undefined) {
+    throw new Error("K0 and K1 are required.");
   }
   //const timestamp = Math.floor(Date.now() / 1000);
   try {
     const [result] = await connection.execute<ResultSetHeader>(
-      `UPDATE user_calibration_data_wl SET a=?,b=?,e=?,K0=?,K1=?,readingA=?, readingB=?, actualA=?, actualB=?, calibration_temperature=?,server_side_cal_flag=? WHERE logger_id=?`,
+      `UPDATE user_calibration_data_wl SET a=?,b=?,e=?,K0=?,K1=?,readingA=?, readingB=?, actualA=?, actualB=?, calibration_temperature=?, resolution=?, temperature_compensation=?, server_side_cal_flag=? WHERE logger_id=?`,
       [
         settings.polynomialA,
         settings.polynomialB,
@@ -92,9 +91,43 @@ export async function updateWaterLevelCalibrationSettings(
         settings.firstReadingReference,
         settings.secondReadingReference,
         settings.temperature,
+        settings.resolution,
+        settings.tempComp,
         settings.serverSideCalFlag,
         loggerId,
       ],
+    );
+    return result.affectedRows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function resetWaterLevelToDefaults(
+  loggerId: string,
+): Promise<number> {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+
+  try {
+    const [result] = await connection.execute<ResultSetHeader>(
+      `UPDATE user_calibration_data_wl AS u
+      JOIN mfr_calibration_data_wl AS m ON u.logger_id = m.logger_id
+      SET 
+      u.a = m.a,
+      u.b = m.b,
+      u.e = m.e,
+      u.K0 = m.K0,
+      u.K1 = m.K1,
+      u.readingA = NULL,
+      u.readingB = NULL,
+      u.actualA = NULL,
+      u.actualB = NULL,
+      u.calibration_temperature = NULL,
+      u.resolution = NULL,
+      temperature_compensation = NULL
+      WHERE m.logger_id = ?`,
+      [loggerId],
     );
     return result.affectedRows;
   } catch (error) {
@@ -119,7 +152,7 @@ export async function fetchParCalibration(
     return undefined;
   }
 
-  console.log("PAR ROW",rows);
+  console.log("PAR ROW", rows);
   rows[0].typeId = 4132;
   return rows[0];
 }
@@ -148,7 +181,6 @@ export async function updateParCalibrationSettings(
     throw error;
   }
 }
-
 
 // END OF PAR //
 

@@ -37,9 +37,15 @@ export async function updateCalibrationSettings(
 ) {
   switch (typeId) {
     case "4131":
+      if(settings.reset){
+        //If the reset flag is set copy the manufacturing settings to the user settings table
+        return calibrationRepository.resetWaterLevelToDefaults(
+        loggerId
+      );
+      }else{
       const waterLevelSettings = settings as WaterlevelUpdateCalibrationSettings;
 
-        const defaultPulseCount = 110;
+      const defaultPulseCount = 110;
       // Water Level
       const mfrCalibrationSettings =
         await calibrationRepository.fetchWaterLevelMfrCalibrationSettings(
@@ -47,6 +53,16 @@ export async function updateCalibrationSettings(
         );
       //console.log("WL MFR SETTINGS", mfrCalibrationSettings);
       //console.log("WL FORM SETTINGS", settings.firstReadingLogger,settings.firstReadingReference);
+      if(!Number.isInteger(settings.firstReadingLogger)){
+        settings.firstReadingLogger = Math.round(settings.firstReadingLogger*10);
+        console.log('FIRST READING CONVERTED',settings.firstReadingLogger);
+      }
+
+      if(!Number.isInteger(settings.secondReadingLogger)){
+        settings.secondReadingLogger = Math.round(settings.secondReadingLogger*10);
+        console.log('SECOND READING CONVERTED',settings.secondReadingLogger);
+      }
+
       const lowTargetReportedCounts = settings.firstReadingReference * 10;
       const highTargetReportedCounts = settings.secondReadingReference * 10;
       const lowCalculatedRaw = roundUp(
@@ -79,11 +95,14 @@ export async function updateCalibrationSettings(
       waterLevelSettings.polynomialE = polynomialValueE;
       waterLevelSettings.K0 = mfrCalibrationSettings?.K0;
       waterLevelSettings.K1 = mfrCalibrationSettings?.K1;
+      waterLevelSettings.resolution = resolution;
+      waterLevelSettings.tempComp = temperatureCompenation;
 
       return calibrationRepository.updateWaterLevelCalibrationSettings(
         loggerId,
         waterLevelSettings,
       );
+    }
     case "4132":
     // PAR
     const ParSettings = settings as ParCalibrationRow;
