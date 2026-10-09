@@ -34,8 +34,8 @@ export interface WaterlevelUpdateCalibrationSettings {
   typeId:4131,
   firstReadingReference: number;
   secondReadingReference: number;
-  firstReadingLogger: number;
-  secondReadingLogger: number;
+  firstReadingLogger: string;
+  secondReadingLogger: string;
   temperature: number;
   polynomialA: number;
   polynomialB: number;

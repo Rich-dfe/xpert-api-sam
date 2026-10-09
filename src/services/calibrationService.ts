@@ -53,15 +53,14 @@ export async function updateCalibrationSettings(
         );
       //console.log("WL MFR SETTINGS", mfrCalibrationSettings);
       //console.log("WL FORM SETTINGS", settings.firstReadingLogger,settings.firstReadingReference);
-      if(!Number.isInteger(settings.firstReadingLogger)){
-        settings.firstReadingLogger = Math.round(settings.firstReadingLogger*10);
-        console.log('FIRST READING CONVERTED',settings.firstReadingLogger);
-      }
-
-      if(!Number.isInteger(settings.secondReadingLogger)){
-        settings.secondReadingLogger = Math.round(settings.secondReadingLogger*10);
-        console.log('SECOND READING CONVERTED',settings.secondReadingLogger);
-      }
+      
+      const formattedFirstLoggerReading = formatNumber(settings.firstReadingLogger);
+      console.log('FIRST READING CONVERTED',settings.firstReadingLogger);
+      waterLevelSettings.firstReadingLogger = formattedFirstLoggerReading;
+      
+      const formattedSecondLoggerReading = formatNumber(settings.secondReadingLogger);
+      console.log('SECOND READING CONVERTED',formattedSecondLoggerReading);
+      waterLevelSettings.secondReadingLogger = formattedSecondLoggerReading;
 
       const lowTargetReportedCounts = settings.firstReadingReference * 10;
       const highTargetReportedCounts = settings.secondReadingReference * 10;
@@ -98,6 +97,8 @@ export async function updateCalibrationSettings(
       waterLevelSettings.resolution = resolution;
       waterLevelSettings.tempComp = temperatureCompenation;
 
+      console.log('ALL CAL SETTINGS',waterLevelSettings);
+
       return calibrationRepository.updateWaterLevelCalibrationSettings(
         loggerId,
         waterLevelSettings,
@@ -121,4 +122,12 @@ export async function updateCalibrationSettings(
     default:
     // Code runs if no cases match
   }
+}
+
+function formatNumber(num:number) {
+  if (num >= 10000 && num <= 99999) {
+    num /= 10;
+  }
+
+  return num.toFixed(1);
 }
