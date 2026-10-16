@@ -60,11 +60,57 @@ export interface WaterlevelMfrCalibrationSettings extends RowDataPacket {
 
 //PAR
 export interface ParCalibrationRow extends RowDataPacket {
-  typeId:4132,
+  typeId:4132;
   loggerReadingTotal: number;
   refReadingAverage: number;
   units: number;
   testDuration: number;
 }
 
-export type UpdateCalibrationSettings = WaterlevelUpdateCalibrationSettings | ParCalibrationRow;
+export interface ParCalibrationUpdateSettings{
+  typeId:4132;
+  loggerReadingTotal: number;
+  refReadingAverage: number;
+  units: number;
+  testDuration: number;
+}
+
+export interface MptCalibrationSettings extends RowDataPacket {
+    dry_limit_line: number;
+    fc_limit_line: number;
+    soil_type_id: number;
+    wilt_point: number;
+    sat_soil_weight: number;
+    dry_soil_weight: number;
+    sat_soil_volume: number;
+    slope: number;
+    offset: number;
+    cal_type: number;
+    cal_method: number;
+    soil_moisture_units: number;
+}
+
+export interface MptSensor {
+  soilType: string;
+  dryPoint: number;
+  fieldCapacity: number;
+  wiltPoint: number;
+  saturatedSoilWeight: number;
+  drySoilWeight: number;
+  saturatedVolume: number;
+  slope: number;
+  offset: number;
+}
+
+export interface MptCalibrationUpdateSettings {
+  units: string;
+  calType: boolean;
+  calcMethod: boolean;
+  sensors: MptSensor[];
+  typeId: number;
+  loggerId: string;
+  loggerUid: number;
+}
+
+export type UpdateCalibrationSettings = WaterlevelUpdateCalibrationSettings | ParCalibrationUpdateSettings | MptCalibrationUpdateSettings;
+

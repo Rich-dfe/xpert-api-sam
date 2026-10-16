@@ -5,6 +5,7 @@ import {
   WaterlevelCalibrationSettings,
   WaterlevelMfrCalibrationSettings,
   ParCalibrationRow,
+  MptCalibrationSettings,
 } from "../types/calibrationSettings";
 import { ResultSetHeader } from "mysql2";
 import { createRdsCurrentTimeStamp } from "../lib/helpers";
@@ -186,11 +187,33 @@ export async function updateParCalibrationSettings(
 
 export async function fetchMptCalibration(
   loggerId: string,
-): Promise<string | undefined> {
+): Promise<MptCalibrationSettings[] | undefined> {
   const pool = getPool();
 
-  const [rows] = await pool.execute<LoggerUidRow[]>(
-    `SELECT mp_user_sensor_count FROM loggers WHERE id = ?`,
+  // const [rows] = await pool.execute<LoggerUidRow[]>(
+  //   `SELECT mp_sensor_id FROM loggers WHERE id = ?`,
+  //   [loggerId],
+  // );
+
+  const [rows] = await pool.execute<MptCalibrationSettings[]>(
+    `SELECT
+	uc.sensor_order,
+    uc.dry_limit_line,
+    uc.fc_limit_line,
+    uc.soil_type_id,
+    uc.wilt_point,
+    uc.sat_soil_weight,
+    uc.dry_soil_weight,
+    uc.sat_soil_volume,
+    uc.slope,
+    uc.offset,
+    uc.cal_type,
+    uc.cal_method,
+    uc.soil_moisture_units
+FROM loggers AS l
+JOIN user_calibration_data_mp_sensors AS uc
+    ON l.mp_sensor_id = uc.sensor_id
+WHERE l.id = ? ORDER BY uc.sensor_order`,
     [loggerId],
   );
 
@@ -198,7 +221,7 @@ export async function fetchMptCalibration(
     return undefined;
   }
 
-  return rows[0].mp_user_sensor_count;
+  return rows;
 }
 
 export async function fetchTemperatureCalibration(

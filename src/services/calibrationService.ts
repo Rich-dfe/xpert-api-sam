@@ -37,13 +37,14 @@ export async function updateCalibrationSettings(
 ) {
   switch (typeId) {
     case "4131":
-      if(settings.reset){
+      const waterLevelSettings = settings as WaterlevelUpdateCalibrationSettings;
+      if(waterLevelSettings.reset){
         //If the reset flag is set copy the manufacturing settings to the user settings table
         return calibrationRepository.resetWaterLevelToDefaults(
         loggerId
       );
       }else{
-      const waterLevelSettings = settings as WaterlevelUpdateCalibrationSettings;
+      //const waterLevelSettings = settings as WaterlevelUpdateCalibrationSettings;
 
       const defaultPulseCount = 110;
       // Water Level
@@ -54,26 +55,26 @@ export async function updateCalibrationSettings(
       //console.log("WL MFR SETTINGS", mfrCalibrationSettings);
       //console.log("WL FORM SETTINGS", settings.firstReadingLogger,settings.firstReadingReference);
       
-      const formattedFirstLoggerReading = formatNumber(settings.firstReadingLogger);
-      console.log('FIRST READING CONVERTED',settings.firstReadingLogger);
+      const formattedFirstLoggerReading = formatNumber(Number(waterLevelSettings.firstReadingLogger));
+      console.log('FIRST READING CONVERTED',waterLevelSettings.firstReadingLogger);
       waterLevelSettings.firstReadingLogger = formattedFirstLoggerReading;
       
-      const formattedSecondLoggerReading = formatNumber(settings.secondReadingLogger);
+      const formattedSecondLoggerReading = formatNumber(Number(waterLevelSettings.secondReadingLogger));
       console.log('SECOND READING CONVERTED',formattedSecondLoggerReading);
       waterLevelSettings.secondReadingLogger = formattedSecondLoggerReading;
 
-      const lowTargetReportedCounts = settings.firstReadingReference * 10;
-      const highTargetReportedCounts = settings.secondReadingReference * 10;
+      const lowTargetReportedCounts = waterLevelSettings.firstReadingReference * 10;
+      const highTargetReportedCounts = waterLevelSettings.secondReadingReference * 10;
       const lowCalculatedRaw = roundUp(
-        (((settings.firstReadingLogger * 10) -
-          mfrCalibrationSettings?.e! * settings.temperature * 100 -
+        (((Number(waterLevelSettings.firstReadingLogger) * 10) -
+          mfrCalibrationSettings?.e! * waterLevelSettings.temperature * 100 -
           mfrCalibrationSettings?.a!) /
           mfrCalibrationSettings?.b!),
         1
       );
       const highCalculatedRaw = roundUp(
-        (((settings.secondReadingLogger * 10) -
-          mfrCalibrationSettings?.e! * settings.temperature * 100 -
+        (((Number(waterLevelSettings.secondReadingLogger) * 10) -
+          mfrCalibrationSettings?.e! * waterLevelSettings.temperature * 100 -
           mfrCalibrationSettings?.a!) /
           mfrCalibrationSettings?.b!),
         1
@@ -83,7 +84,7 @@ export async function updateCalibrationSettings(
       
       const polynomialValueB = calculateSlope(lowTargetReportedCounts,highTargetReportedCounts,lowCalculatedRaw,highCalculatedRaw);
       const polynomialValueE = (mfrCalibrationSettings?.e!*mfrCalibrationSettings?.sensorLength!/defaultPulseCount)*polynomialValueB/mfrCalibrationSettings?.b!;
-      const polynomialValueA = (10*settings.firstReadingReference)-((settings.temperature*100)*polynomialValueE)-lowCalculatedRaw*polynomialValueB;
+      const polynomialValueA = (10*waterLevelSettings.firstReadingReference)-((waterLevelSettings.temperature*100)*polynomialValueE)-lowCalculatedRaw*polynomialValueB;
       const resolution = roundUpResolution(polynomialValueB/10,1);
       const temperatureCompenation = polynomialValueE*10;
       //console.log('CAL VALUES',polynomialValueA,polynomialValueB,polynomialValueE,mfrCalibrationSettings?.K0,mfrCalibrationSettings?.K1,resolution,temperatureCompenation);
@@ -115,6 +116,7 @@ export async function updateCalibrationSettings(
     //return loggerRepository.fetchParCalibration(loggerId);
     case "4161":
     // Multi Profile
+    console.log('MPT UPDATE SETTINGS', settings);
     //return loggerRepository.fetchMptCalibration(loggerId);
     case "4181":
     // Temperature sensor
