@@ -267,7 +267,7 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
-  UpdateLoggerCalibraionSettingsFunction:
+  UpdateLoggerCalibrationSettingsFunction:
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: esbuild

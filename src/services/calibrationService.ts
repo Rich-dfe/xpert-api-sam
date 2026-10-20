@@ -1,5 +1,5 @@
 import * as calibrationRepository from "../repositories/calibrationRepository";
-import { WaterlevelUpdateCalibrationSettings, UpdateCalibrationSettings, ParCalibrationRow } from "../types/calibrationSettings";
+import { WaterlevelUpdateCalibrationSettings, UpdateCalibrationSettings, ParCalibrationRow, MptCalibrationUpdateSettings } from "../types/calibrationSettings";
 import { roundUp, calculateSlope, roundUpResolution } from "../lib/helpers";
 
 ///////////////////////////////////////////
@@ -116,7 +116,9 @@ export async function updateCalibrationSettings(
     //return loggerRepository.fetchParCalibration(loggerId);
     case "4161":
     // Multi Profile
-    console.log('MPT UPDATE SETTINGS', settings);
+    const mptSettings = settings as MptCalibrationUpdateSettings;
+    console.log('MPT UPDATE SETTINGS', mptSettings.sensorId,loggerId);
+    return calibrationRepository.updateMptCalibrationSettings(loggerId, mptSettings.sensorId,mptSettings);
     //return loggerRepository.fetchMptCalibration(loggerId);
     case "4181":
     // Temperature sensor

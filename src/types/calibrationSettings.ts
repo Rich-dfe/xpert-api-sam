@@ -110,6 +110,7 @@ export interface MptCalibrationUpdateSettings {
   typeId: number;
   loggerId: string;
   loggerUid: number;
+  sensorId:number;
 }
 
 export type UpdateCalibrationSettings = WaterlevelUpdateCalibrationSettings | ParCalibrationUpdateSettings | MptCalibrationUpdateSettings;

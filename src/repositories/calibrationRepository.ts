@@ -6,6 +6,7 @@ import {
   WaterlevelMfrCalibrationSettings,
   ParCalibrationRow,
   MptCalibrationSettings,
+  MptCalibrationUpdateSettings,
 } from "../types/calibrationSettings";
 import { ResultSetHeader } from "mysql2";
 import { createRdsCurrentTimeStamp } from "../lib/helpers";
@@ -185,6 +186,8 @@ export async function updateParCalibrationSettings(
 
 // END OF PAR //
 
+// MULTI PROFILE //
+
 export async function fetchMptCalibration(
   loggerId: string,
 ): Promise<MptCalibrationSettings[] | undefined> {
@@ -197,7 +200,8 @@ export async function fetchMptCalibration(
 
   const [rows] = await pool.execute<MptCalibrationSettings[]>(
     `SELECT
-	uc.sensor_order,
+	  uc.sensor_order,
+    uc.sensor_id,
     uc.dry_limit_line,
     uc.fc_limit_line,
     uc.soil_type_id,
@@ -224,6 +228,81 @@ WHERE l.id = ? ORDER BY uc.sensor_order`,
   return rows;
 }
 
+export async function updateMptCalibrationSettings(
+  loggerId: string,
+  sensorId: number,
+  settings: MptCalibrationUpdateSettings,
+): Promise<number> {
+  const connection = await getPool().getConnection();
+  let totalAffectedRows = 0;
+  console.log("MPT UPDATE REPO ARRAY", loggerId, sensorId, settings);
+
+  try {
+    // 2. Start the transaction
+    await connection.beginTransaction();
+
+    const sql =
+      `UPDATE user_calibration_data_mp_sensors SET 
+      dry_limit_line = ?, 
+      fc_limit_line = ?, 
+      wilt_point = ?, 
+      sat_soil_weight = ?, 
+      dry_soil_weight = ?,
+      sat_soil_volume = ?,
+      slope = ?,
+      \`offset\` = ?,
+      cal_type = ?, 
+      cal_method = ?,
+      soil_moisture_units = ?
+      WHERE sensor_order = ? AND sensor_id = ?`;
+
+    // 3. Loop through your 5 rows using the same connection
+    for (let i = 0; i < settings.sensors.length; i++) {
+      const sensorCount = i + 1; //sensor number
+      const row = settings.sensors[i]; //array index number
+      console.log(
+        `Updaing using row at index: ${i} with sensor id ${sensorId} and sensor number ${sensorCount}`,
+      );
+
+      const [result] = await connection.execute(sql, [
+        row.dryPoint,
+        row.fieldCapacity,
+        row.wiltPoint,
+        row.saturatedSoilWeight,
+        row.drySoilWeight,
+        row.saturatedVolume,
+        row.slope,
+        row.offset,
+        settings.calType,
+        settings.calcMethod,
+        settings.units,
+        sensorCount,
+        sensorId,
+      ]);
+      totalAffectedRows += (result as any).affectedRows;
+    }
+
+    // Commit the transaction!
+    await connection.commit();
+    console.log("Transaction successfully committed!");
+
+    if (totalAffectedRows === settings.sensors.length) {
+      return 1;
+    }
+  } catch (error) {
+    // 5. Rollback if any single update fails
+    await connection.rollback();
+    console.error("Update failed, transaction rolled back:", error);
+    throw error;
+  } finally {
+    connection.release();
+  }
+  return 0;
+}
+
+// END OF MULTI PROFILE
+
+// TEMPERATURE
 export async function fetchTemperatureCalibration(
   loggerId: string,
 ): Promise<string | undefined> {
@@ -240,6 +319,8 @@ export async function fetchTemperatureCalibration(
 
   return rows[0].mp_user_sensor_count;
 }
+
+// END OF TEMPERATURE
 
 ///////////////////////////////////////////
 // END OF CALIBRATION SETTINGS
