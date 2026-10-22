@@ -29,4 +29,17 @@ export interface LoggerLookup extends RowDataPacket{
 }
 
 export interface LoggerConfigSettingsDBResult extends LoggerConfigSettings, RowDataPacket {};
- 
+
+export type LatestDiagnosticData = {
+  data1: number,
+  data2: number,
+  type: number
+}
+
+export type LatestDiagnosticDatabaseResponse = {
+  loggerUid: string,
+  logDateTime: number,
+  createdAt: number,
+  ttlDate: number,
+  diagnostics: LatestDiagnosticData[],
+}

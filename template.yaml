@@ -73,7 +73,25 @@ Resources:
               - dynamodb:PutItem
             Resource:
               - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyAuditTrail
-              
+
+  DynamoDBPermissionsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:GetItem
+              - dynamodb:Query
+            Resource:
+              - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyAuditTrail
+              - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyClockChangeData
+              - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyDiagnostic
+              - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyMetaData
+              - arn:aws:dynamodb:ap-southeast-2:224788441969:table/PrimaryData
+
   #################################################
   # User Functions
   #################################################
@@ -285,6 +303,25 @@ Resources:
             Method: patch
             Auth:
               Authorizer: CognitoAuthorizer
+
+  fetchLatestDiagnosticSettingsFunction:
+      Type: AWS::Serverless::Function
+      Metadata:
+        BuildMethod: esbuild
+      Properties:
+        CodeUri: src/
+        Handler: handlers/loggers/fetchLatestDiagnosticSettings.lambdaHandler
+        Policies:
+        - !Ref DynamoDBPermissionsPolicy
+        Events:
+          fetchLatestDiagnosticSettings:
+            Type: Api
+            Properties:
+              RestApiId: !Ref XpertApi
+              Path: /loggers/diagnostic/{uid}/latest
+              Method: get
+              Auth:
+                Authorizer: CognitoAuthorizer              
   
 Outputs:
   ApiUrl:

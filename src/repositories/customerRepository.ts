@@ -62,7 +62,7 @@ export async function listLoggersByCustomerUserGroup(
 
   const [rows] = await pool.query<Logger[]>(
     `
-        SELECT l.id, l.product_id AS productId, l.logger_uid AS loggerUid, l.logger_name AS loggerName, p.type_id AS typeId
+        SELECT l.id, l.product_id AS productId, l.logger_uid AS loggerUid, l.logger_name AS loggerName,l.lat,l.lng,p.type_id AS typeId
         FROM loggers l
         JOIN products p ON l.product_id = p.id
         WHERE l.customer_id = ?
@@ -87,7 +87,7 @@ export async function listLoggersByCustomerUser(
 
   const [rows] = await pool.query<Logger[]>(
     `
-        SELECT l.id, l.product_id AS productId, l.logger_uid AS loggerUid, l.logger_name AS loggerName, p.type_id AS typeId
+        SELECT l.id, l.product_id AS productId, l.logger_uid AS loggerUid, l.logger_name AS loggerName,l.lat,l.lng,p.type_id AS typeId
         FROM loggers l
         JOIN products p ON l.product_id = p.id
         WHERE l.customer_id = 16 

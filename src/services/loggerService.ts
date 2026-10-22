@@ -1,5 +1,6 @@
 import * as loggerRepository from "../repositories/loggerRespository";
-import { LoggerConfigSettings } from "../types/logger";
+import * as dynamoLoggerRepository from "../repositories/dynamoLoggerRespository";
+import { LoggerConfigSettings, LatestDiagnosticDatabaseResponse } from "../types/logger";
 import { WaterlevelUpdateCalibrationSettings } from "../types/calibrationSettings";
 
 ///////////////////////////////////////////
@@ -91,4 +92,10 @@ export async function fetchLoggerUidByLoggerId(
   loggerId: string,
 ): Promise<string | undefined> {
   return loggerRepository.fetchLoggerUidByLoggerId(loggerId);
+}
+
+export async function fetchLatestDiagnosticData(
+  loggerUid: string
+): Promise<LatestDiagnosticDatabaseResponse>{
+  return dynamoLoggerRepository.getMostRecentDiagnosticRecord(loggerUid)
 }
