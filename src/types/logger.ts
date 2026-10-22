@@ -43,3 +43,13 @@ export type LatestDiagnosticDatabaseResponse = {
   ttlDate: number,
   diagnostics: LatestDiagnosticData[],
 }
+
+export interface GeneralLoggerInfo extends RowDataPacket {
+  loggerName: string,
+  type: string,
+  model: string,
+  serialNumber: string,
+  serverSettingsVewrsion: number,
+  loggerSettingsVersion: number,
+  firmwareVersion: number,
+}

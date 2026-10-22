@@ -2,8 +2,8 @@ import { getPool } from "../lib/database";
 import {
   LoggerConfigSettings,
   LoggerConfigSettingsDBResult,
+  GeneralLoggerInfo,
 } from "../types/logger";
-import { WaterlevelCalibrationRow,WaterlevelUpdateCalibrationSettings, WaterlevelCalibrationSettings } from "../types/calibrationSettings";
 import { ResultSetHeader } from "mysql2";
 import { createRdsCurrentTimeStamp } from "../lib/helpers";
 import { RowDataPacket } from "mysql2/promise";
@@ -122,6 +122,37 @@ export async function fetchLoggerConfigSettings(
       JOIN groups g ON g.id = l.group_id
       JOIN products p ON p.id = l.product_id
       WHERE l.id = ?`,
+    [loggerId],
+  );
+
+  if (rows.length === 0) {
+    return [];
+  }
+
+  return rows;
+}
+
+export async function fetchGeneralLoggerInfo(
+  loggerId: string,
+): Promise<GeneralLoggerInfo[]> {
+  const pool = getPool();
+
+  const [rows] = await pool.execute<GeneralLoggerInfo[]>(
+    `SELECT 
+    l.logger_name as loggerName,
+    l.logger_uid as loggerUid,
+    l.settingsVersionInUse,
+    l.firmwareVersionInUse,
+    l.settingsVersionDateLogged,
+    l.firmwareVersionDateLogged,
+    p.product_name as productName,
+    p.model,
+    p.type,
+    u.x002F
+    FROM loggers AS l 
+    JOIN products AS p ON l.product_id = p.id
+    JOIN user_settings AS u ON l.id = u.logger_id
+    WHERE l.id = ?`,
     [loggerId],
   );
 
@@ -335,4 +366,3 @@ export async function updateRainGaugeSensorConfig(
 ///////////////////////////////////////////
 // END OF SENSOR SETTINGS
 //////////////////////////////////////////
-

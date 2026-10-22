@@ -304,24 +304,41 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
-  fetchLatestDiagnosticSettingsFunction:
-      Type: AWS::Serverless::Function
-      Metadata:
-        BuildMethod: esbuild
-      Properties:
-        CodeUri: src/
-        Handler: handlers/loggers/fetchLatestDiagnosticSettings.lambdaHandler
-        Policies:
-        - !Ref DynamoDBPermissionsPolicy
-        Events:
-          fetchLatestDiagnosticSettings:
-            Type: Api
-            Properties:
-              RestApiId: !Ref XpertApi
-              Path: /loggers/diagnostic/{uid}/latest
-              Method: get
-              Auth:
-                Authorizer: CognitoAuthorizer              
+  fetchLatestDiagnosticDataFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/loggers/fetchLatestDiagnosticData.lambdaHandler
+      Policies:
+      - !Ref DynamoDBPermissionsPolicy
+      Events:
+        fetchLatestDiagnosticData:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /loggers/diagnostic/{uid}/latest
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  fetchGeneralLoggerInfoFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/loggers/fetchGeneralLoggerInfo.lambdaHandler
+      Events:
+        fetchLoggerConfigSettings:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /loggers/{lid}/info
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer           
   
 Outputs:
   ApiUrl:
