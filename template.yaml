@@ -40,7 +40,8 @@ Globals:
         DB_PORT: "3306"
         DB_NAME: logportal
         LOG_LEVEL: debug
-        DDB_AUDIT_TABLE_NAME: odyAuditTrail  
+        DDB_AUDIT_TABLE_NAME: odyAuditTrail
+        DDB_PRIMARY_DATA_TABLE_NAME: odyPrimaryData  
 
 Resources:
   #################################################
@@ -90,7 +91,7 @@ Resources:
               - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyClockChangeData
               - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyDiagnostic
               - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyMetaData
-              - arn:aws:dynamodb:ap-southeast-2:224788441969:table/PrimaryData
+              - arn:aws:dynamodb:ap-southeast-2:224788441969:table/odyPrimaryData
 
   #################################################
   # User Functions
@@ -340,6 +341,24 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer           
   
+  fetchLoggerChartDataFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+    Properties:
+      CodeUri: src/
+      Handler: handlers/loggers/fetchLoggerChartData.lambdaHandler
+      Policies:
+      - !Ref DynamoDBPermissionsPolicy
+      Events:
+        fetchLoggerChartData:
+          Type: Api
+          Properties:
+            RestApiId: !Ref XpertApi
+            Path: /loggers/{lid}/{tid}/chart-data
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint

@@ -53,3 +53,22 @@ export interface GeneralLoggerInfo extends RowDataPacket {
   loggerSettingsVersion: number,
   firmwareVersion: number,
 }
+
+export interface LoggerReading {
+  loggerUid: string;
+  logDateTime: number;
+
+  data1?: number;
+  data2?: number;
+  s1?: number;
+  s2?: number;
+  s3?: number;
+  s4?: number;
+  s5?: number;
+  s1t?: number;
+  s2t?: number;
+  s3t?: number;
+  s4t?: number;
+  s5t?: number;
+  s11t?: number;
+}
