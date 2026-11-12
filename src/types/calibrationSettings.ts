@@ -115,3 +115,82 @@ export interface MptCalibrationUpdateSettings {
 
 export type UpdateCalibrationSettings = WaterlevelUpdateCalibrationSettings | ParCalibrationUpdateSettings | MptCalibrationUpdateSettings;
 
+export interface ChartDataCalibrationSettingsWaterLevel extends RowDataPacket {
+  a: number;
+  b: number;
+  e: number;
+  calibrationTemperature: number;
+}
+
+export interface ChartDataCalibrationSettingsPar extends RowDataPacket {
+  referenceValue: number;
+  referenceInterval: number;
+  units: number;
+  loggerInterval: number;
+}
+
+export interface ChartDataCalibrationSettingsRainGauge extends RowDataPacket {
+  scalingFactor: number;
+  units: number;
+}
+
+export interface ChartDataCalibrationSettingsTemperature extends RowDataPacket {
+  units: number;
+}
+
+export interface ChartDataCalibrationSettingsMpt extends RowDataPacket {
+  dryLimitLine: number;
+  fcLimitLine: number ;
+  wiltPoint: number;
+  slope: number;
+  offset: number;
+  calType: number;
+}
+
+export type ChartDataCalibrationSettings =
+  | ChartDataCalibrationSettingsWaterLevel
+  | ChartDataCalibrationSettingsPar
+  | ChartDataCalibrationSettingsRainGauge
+  | ChartDataCalibrationSettingsMpt
+  | ChartDataCalibrationSettingsTemperature;
+
+//////////////////////////////////////////////////
+// WATER LEVEL CALIBRATION TYPEs
+//////////////////////////////////////////////////
+export interface WaterLevelReading {
+    createdAt: number;
+    data1: number;
+    data2: number;
+    loggerUid: string;
+    ttlDate: number;
+    type: number;
+    logDateTime: number;
+}
+
+//This is the extra infomration sent from api to format chart
+export interface WaterLevelMeasurement {
+    field: string;
+    name: string;
+    availableUnits: string[];
+    defaultUnit: string;
+}
+
+export interface WaterLevelReadingsObject {
+    success: boolean;
+    readings: WaterLevelReading[];
+    measurements: WaterLevelMeasurement[];
+}
+
+export interface WaterLevelCalibrationValues {
+    a: number;
+    b: number;
+    e: number;
+    calibrationTemperature: number;
+}
+
+export type WaterLevelCalibrationArray = WaterLevelCalibrationValues[];
+
+//////////////////////////////////////////////////
+// END OF WATER LEVEL CALIBRATION TYPEs
+//////////////////////////////////////////////////
+

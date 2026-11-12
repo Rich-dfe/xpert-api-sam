@@ -49,6 +49,8 @@ export async function getChartData(
         },
 
         ExclusiveStartKey: lastEvaluatedKey,
+
+        Limit: 53000,
       }),
     );
 

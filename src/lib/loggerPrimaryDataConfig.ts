@@ -122,9 +122,8 @@ export const loggerMeasurementConfig: LoggerMeasurementConfig = {
       field: "data1",
       name: "Rain Fall",
       availableUnits: [
-        MeasurementUnit.METRES,
+        MeasurementUnit.CENTIMETRES,
         MeasurementUnit.MILLIMETRES,
-        MeasurementUnit.FEET,
       ],
       defaultUnit: MeasurementUnit.MILLIMETRES,
     },
@@ -152,6 +151,26 @@ export const loggerMeasurementConfig: LoggerMeasurementConfig = {
     {
       field: "data2",
       name: "Internal Temperature",
+      availableUnits: [
+        MeasurementUnit.CELSIUS,
+        MeasurementUnit.FAHRENHEIT
+      ],
+      defaultUnit: MeasurementUnit.CELSIUS,
+    }
+  ],
+  4294: [
+    {
+      field: "data1",
+      name: "Sweep Count",
+      availableUnits: [
+        MeasurementUnit.CELSIUS,
+        MeasurementUnit.FAHRENHEIT
+      ],
+      defaultUnit: MeasurementUnit.CELSIUS,
+    },
+    {
+      field: "data2",
+      name: "Temperature",
       availableUnits: [
         MeasurementUnit.CELSIUS,
         MeasurementUnit.FAHRENHEIT

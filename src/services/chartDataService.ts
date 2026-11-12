@@ -1,9 +1,11 @@
 import { validateLoggerLicense } from "./licenseService";
 import { getChartData } from "../repositories/chartDataRepository";
+import { getChartDataCalibrationSettings } from "../repositories/chartDataCalibrationRepository";
 import { loggerMeasurementConfig } from "../lib/loggerPrimaryDataConfig";
-
+import { calibrateChartData } from "./chartDataCalibrationService";
 import type { LoggerReading } from "../types/logger";
 import type { MeasurementConfig } from "../lib/loggerPrimaryDataConfig";
+import { fetchCalibrationSettings } from "./calibrationService";
 
 export interface ChartDataResult {
   success: boolean;
@@ -54,8 +56,13 @@ export async function getLoggerChartData(
     };
   }
 
+  //Get the calibration settings to apply to the dynamodb chart data
+  const calibrationSettings = await getChartDataCalibrationSettings(loggerUid, loggerTypeId)
+  console.log('CAL DATA',calibrationSettings);
+
   //Get primary readings from dynamoDB
-  const readings = await getChartData(loggerUid, startDate, endDate);
+  const rawReadings = await getChartData(loggerUid, startDate, endDate);
+  const readings = calibrateChartData(rawReadings,calibrationSettings,loggerTypeId);
 
   return {
     success: true,
