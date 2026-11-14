@@ -1,6 +1,6 @@
 import { RowDataPacket } from "mysql2";
-import { OnDatagramStatusCallback } from "node:quic";
-import { updateWaterLevelCalibrationSettings } from "../repositories/calibrationRepository";
+import type { LoggerReading } from "../types/logger";
+import type { MeasurementConfig } from "../lib/loggerPrimaryDataConfig";
 
 
 //WATER LEVEL
@@ -194,3 +194,9 @@ export type WaterLevelCalibrationArray = WaterLevelCalibrationValues[];
 // END OF WATER LEVEL CALIBRATION TYPEs
 //////////////////////////////////////////////////
 
+export interface ChartDataApiResponse {
+  success: boolean;
+  message?: string;
+  readings?: LoggerReading[];
+  measurements?: MeasurementConfig[];
+}

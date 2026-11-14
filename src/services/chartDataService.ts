@@ -2,24 +2,16 @@ import { validateLoggerLicense } from "./licenseService";
 import { getChartData } from "../repositories/chartDataRepository";
 import { getChartDataCalibrationSettings } from "../repositories/chartDataCalibrationRepository";
 import { loggerMeasurementConfig } from "../lib/loggerPrimaryDataConfig";
-import { calibrateChartData } from "./chartDataCalibrationService";
-import type { LoggerReading } from "../types/logger";
-import type { MeasurementConfig } from "../lib/loggerPrimaryDataConfig";
-import { fetchCalibrationSettings } from "./calibrationService";
+import { calibrateChartData } from "./chartDataCalibrationService";;
+import type { ChartDataApiResponse } from "../types/calibrationSettings";
 
-export interface ChartDataResult {
-  success: boolean;
-  message?: string;
-  readings?: LoggerReading[];
-  measurements?: MeasurementConfig[];
-}
 
 export async function getLoggerChartData(
   loggerUid: string,
   loggerTypeId: number,
   startDate: number,
   endDate: number,
-): Promise<ChartDataResult> {
+): Promise<ChartDataApiResponse> {
   //Validate requested date range
   if (
     !Number.isSafeInteger(startDate) ||

@@ -57,6 +57,8 @@ export interface GeneralLoggerInfo extends RowDataPacket {
 export interface LoggerReading {
   loggerUid: string;
   logDateTime: number;
+  ttlDate: number;
+  type: number;
 
   data1?: number;
   data2?: number;
